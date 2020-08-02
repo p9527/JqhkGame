@@ -4,6 +4,9 @@
 ![image](https://github.com/p9527/JqhkGame/blob/master/images/打砖块.gif)
 ![image](https://github.com/p9527/JqhkGame/blob/master/images/关卡编辑器.gif)
 
+## FlappyBird
+![image](https://github.com/p9527/JqhkGame/blob/master/images/flappybird.gif)
+
 ## 打飞机
 ![image](https://github.com/p9527/JqhkGame/blob/master/images/飞机.gif)
 
