@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        canvas {
+            border: solid 2px lightskyblue;
+        }
+        div {
+            border: solid 1px lightskyblue;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="id-canvas"
+        data-action="draw_tile"
+        data-type="source"
+        width="400" height="300"></canvas>
+    <div class="gua-image">
+        <img src="images/block1.png" data-action="change_active" data-id="1">
+        <img src="images/block2.png" data-action="change_active" data-id="2">
+        <img src="images/block3.png" data-action="change_active" data-id="3">
+        <img src="images/null.png" data-action="change_active" data-id="0">
+    </div>
+    <button data-action="save_level">保存关卡</button>
+</body>
+<script>
+    const e = sel => document.querySelector(sel)
+    const log = console.log.bind(console)
+
+    const actions = {
+        change_active(event) {
+            let activeTile = event.target
+            let id = activeTile.dataset.id
+            window.activeTile = activeTile
+        },
+        save_level(event) {
+            window.map.save()
+            window.map.init()
+            window.context.fillRect(0, 0, 1000, 1000)
+        }
+    }
+
+    const tilePosition = (x, y) => {
+        let imgWidth = 50
+        let imgHeight = 20
+        let i = Math.floor(x / imgWidth)
+        let j = Math.floor(y / imgHeight)
+        window.map.setTile(i, j, window.activeTile.dataset.id)
+        let x1 = i * imgWidth
+        let y1 = j * imgHeight
+        // log(x, y, x1, y1)
+        return [x1, y1]
+    }
+
+    const drawTile = (x, y) => {
+        let imgWidth = 50
+        let imgHeight = 20
+        let [x1, y1] = tilePosition(x, y)
+        let context = window.context
+        context.fillRect(x1, y1, imgWidth, imgHeight)
+        let tile = window.activeTile
+        // log(x1, y1, tile)
+        context.drawImage(tile, x1, y1)
+    } 
+
+    const bindEvent = () => {
+        e('body').addEventListener('click', event => {
+            let target = event.target
+            let action = target.dataset.action
+            actions[action] && actions[action](event)
+        })
+        let moving = false
+        window.canvas.addEventListener('mousedown', event => {
+            moving = true
+            let x = event.offsetX
+            let y = event.offsetY
+            // log(event)s
+            drawTile(x, y)
+        })
+        window.canvas.addEventListener('mousemove', event => {
+            if (moving) {
+                let x = event.offsetX
+                let y = event.offsetY
+                drawTile(x, y)
+            }
+        })
+        window.canvas.addEventListener('mouseup', event => {
+            moving = false
+        })
+
+    }
+
+    const init = () => {
+        window.activeTile = null
+        window.canvas = e('canvas')
+        window.context = window.canvas.getContext('2d')
+        window.context.fillStyle = '#555535'
+        window.context.fillRect(0, 0, 1000, 1000)
+        window.map = new Map()
+    }
+
+    class Map {
+        constructor() {
+            this.height = 15
+            this.width = 8
+
+            this.imgWidth = 50
+            this.imgHeight = 20
+            this.init()
+        }
+        init() {
+            this.tiles = new Array(this.height * this.width).fill(0)
+        }
+        setTile(i, j, tile) {
+            if (tile == null) {
+                tile = 0
+            }
+            let index = (j * this.width) + i
+            if (index < 120) {
+                this.tiles[index] = tile
+            }
+        }
+        expertJSON() {
+            let s = JSON.stringify(this.tiles)
+            log(s)
+        }
+        save() {
+            if (localStorage['levels'] == null || localStorage['levels'] == "") {
+                var levels = []
+                levels.push(this.tiles)
+                localStorage['levels'] = JSON.stringify(levels)
+            } else {
+                let levels = JSON.parse(localStorage['levels'])
+                levels.push(this.tiles)
+                localStorage['levels'] = JSON.stringify(levels)
+            }
+        }
+    }
+
+
+    const __main = () => {
+        init()
+        bindEvent()
+    }
+
+    __main()
+
+    
+</script>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        canvas {
+            border: solid 2px lightskyblue;
+        }
+        div {
+            border: solid 1px lightskyblue;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="id-canvas"
+        data-action="draw_tile"
+        data-type="source"
+        width="640" height="640"></canvas>
+    <div class="gua-image">
+        <img src="images/t1.png" data-action="change_active" data-id="1">
+        <img src="images/t2.png" data-action="change_active" data-id="2">
+        <img src="images/t3.png" data-action="change_active" data-id="3">
+        <img src="images/t4.png" data-action="change_active" data-id="4">
+        <img src="images/t0.png" data-action="change_active" data-id="0">
+    </div>
+    <div class="gua-control">
+        <button data-action="change_offset" data-offset="-1024">-1024</button>
+        <button data-action="change_offset" data-offset="-16">-16</button>
+        <button data-action="change_offset" data-offset="16">16</button>
+        <button data-action="change_offset" data-offset="1024">1024</button>
+        <button data-action="change_color">改变颜色</button>
+    </div>
+</body>
+<script>
+    const e = sel => document.querySelector(sel)
+    const log = console.log.bind(console)
+
+    const actions = {
+        change_active(event) {
+            let activeTile = event.target
+            let id = activeTile.dataset.id
+            window.activeTile = activeTile
+        },
+    }
+
+    const tilePosition = (x, y) => {
+        let tileSize = 32
+        let i = Math.floor(x / tileSize)
+        let j = Math.floor(y / tileSize)
+        window.map.setTile(i, j, window.activeTile.dataset.id)
+        let x1 = i * tileSize
+        let y1 = j * tileSize
+        // log(x, y, x1, y1)
+        return [x1, y1]
+    }
+
+    const drawTile = (x, y) => {
+        let tileSize = 32
+        let [x1, y1] = tilePosition(x, y)
+        let context = window.context
+        context.fillRect(x1, y1, tileSize, tileSize)
+        let tile = window.activeTile
+        // log(x1, y1, tile)
+        context.drawImage(tile, x1, y1)
+    } 
+
+    const bindEvent = () => {
+        e('body').addEventListener('click', event => {
+            let target = event.target
+            let action = target.dataset.action
+            actions[action] && actions[action](event)
+        })
+        let moving = false
+        window.canvas.addEventListener('mousedown', event => {
+            moving = true
+            let x = event.offsetX
+            let y = event.offsetY
+            // log(event)s
+            drawTile(x, y)
+        })
+        window.canvas.addEventListener('mousemove', event => {
+            if (moving) {
+                let x = event.offsetX
+                let y = event.offsetY
+                drawTile(x, y)
+            }
+        })
+        window.canvas.addEventListener('mouseup', event => {
+            moving = false
+        })
+
+    }
+
+    const init = () => {
+        window.activeTile = null
+        window.canvas = e('canvas')
+        window.context = window.canvas.getContext('2d')
+        window.context.fillStyle = '#688df8'
+        window.context.fillRect(0, 0, 1000, 1000)
+        window.map = new Map()
+    }
+
+    class Map {
+        constructor() {
+            this.height = 20
+            this.width = 20
+            this.tiles = new Array(this.height * this.width).fill(0)
+        }
+        setTile(i, j, tile) {
+            if (tile == null) {
+                tile = 0
+            }
+            let index = (i * this.height) + j
+            this.tiles[index] = tile
+        }
+        expertJSON() {
+            let s = JSON.stringify(this.tiles)
+            log(s)
+        }
+    }
+
+
+    const __main = () => {
+        init()
+        bindEvent()
+    }
+
+    __main()
+
+    
+</script>
+</html>

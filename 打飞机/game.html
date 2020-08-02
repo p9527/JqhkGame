@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>game</title>
+    <style>
+        canvas {
+            border: 1px black solid;
+        }
+    </style>
+    <script src="guagame/utils.js"></script>
+    <script src="guagame/gua_game.js"></script>
+    <script src="guagame/gua_scene.js"></script>
+    <script src="guagame/gua_image.js"></script>
+
+    <script src="level.js"></script>
+
+    <script src="scene/main/scene.js"></script>
+    <script src="scene/main/player.js"></script>
+    <script src="scene/main/enemy.js"></script>
+    <script src="scene/main/bullet.js"></script>
+    <script src="scene/main/enemy_bullet.js"></script>
+    <script src="scene/main/config.js"></script>
+
+    <script src="scene/end/scene_end.js"></script>
+
+</head>
+<body>
+    <canvas id="id-canvas" height="500" width="400"></canvas>
+    <hr>
+    <input id="id-input-fps" type="range" value="1">
+    <div id="gua-slides">
+        <!-- <div>
+            <label>
+                <input type="range" class="gua-auto-slide" 
+                    data-value="config.player_speed">
+                player_speed: <label class="gua-slide-text">0</label>
+            </label>
+        </div> -->
+    </div>
+    
+
+<script src="main.js"></script>
+<script>
+    var gua_slide_template =function(config, name) {
+        let s = `
+        <div>
+            <label>
+                <input type="range" class="gua-auto-slide" 
+                    data-value="${config}.${name}">
+                ${name}: <label class="gua-slide-text">0</label>
+            </label>
+        </div>
+        `
+        return s
+    }
+
+    var addGuaSlide = function() {
+        let guaSlides = document.querySelector("#gua-slides")
+        let names = Object.keys(config)
+        for (let i = 0; i < names.length; i++) {
+            let e = names[i];
+            let template = gua_slide_template("config", String(e))
+            // log(template)
+            guaSlides.insertAdjacentHTML('beforeend', template)
+        }
+    }
+
+    var bindAll = function(sel, eventName, callBack) {
+        var l = es(sel)
+        // log(l)
+        for (let i = 0; i < l.length; i++) {
+            let e = l[i];
+            e.addEventListener(eventName, function(event) {
+                callBack(event)
+            }) 
+        }
+    }
+
+    var slideMain = function() {
+        addGuaSlide()
+        bindAll(".gua-auto-slide", 'input', function(event) {
+            var target = event.target
+            var name = target.dataset.value
+            var v = target.value
+            // log(name, v)
+            eval(`${name} = ${v}`)
+            var label = target.closest('label').querySelector('.gua-slide-text')
+            label.innerText = v
+        })
+    }
+
+    slideMain()
+</script>
+</body>
+</html>

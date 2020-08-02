@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>game</title>
+    <style>
+        canvas {
+            border: 1px black solid;
+        }
+        div {
+            border: 1px lightskyblue solid;
+        }
+    </style>
+    <script src="guagame/utils.js"></script>
+    <script src="guagame/guagame.js"></script>
+    <script src="guagame/gua_scene.js"></script>
+
+    <script src="level.js"></script>
+
+    <script src="scene/main/block.js"></script>
+    <script src="scene/main/paddle.js"></script>
+    <script src="scene/main/ball.js"></script>
+    <script src="scene/main/scene.js"></script>
+
+    <script src="scene/end/scene_end.js"></script>
+
+</head>
+<body>
+    <canvas id="id-canvas" height="300" width="400"></canvas>
+    <hr>
+    <input id="id-input-fps" type="range" value="1">
+    <div id="id-div-levels">
+    </div>
+
+<script src="main.js"></script>
+<script>
+    const actions = {
+        loadLevels(event) {
+            let target = event.target
+            let levelNum = Number(target.dataset.level)
+            // log(levelNum)
+            loadLevel(window.game, levelNum)
+        },
+    }
+
+    const bindAll = () => {
+        document.querySelector('body').addEventListener('click', event => {
+            // log(event)
+            let target = event.target
+            let action = target.dataset.action
+            actions[action] && actions[action](event)
+        })
+    }
+
+    const insertLevelButton = () => {
+        let length = levels.length
+        let buttonDiv = document.querySelector('#id-div-levels')
+        for (let i = 0; i < length; i++) {
+            let template = `        
+            <button data-action="loadLevels" data-level="${i + 1}">第${i + 1}关</button>
+            `
+            buttonDiv.insertAdjacentHTML('beforeend', template)
+        }
+    }
+
+    const __levelMain = () => {
+        insertLevelButton()
+        bindAll()
+    }
+
+    __levelMain()
+</script>
+</body>
+</html>
